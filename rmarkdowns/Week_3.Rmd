@@ -92,8 +92,9 @@ The first step in creating an `osmdata` query is defining the geographical area 
 **Challenge 2: Create a bounding box for your project target area.**
 
 ```{r}
-bb <- getbb("Maui")
-bb
+#bb <- getbb("Maui")
+#bb <- getbb("Japan") #Ran into issues with it being too big
+bb <- getbb("Guam")
 ```
 The `osmdata` package retrieves data from the overpass API, which is a read-only API that serves up custom selected parts of the OSM map data. To retrieve the required features of a place (defined by the bounding box), we have to then create an overpass query. This can be easily done using the `opq()` function of the osmdata package. Here we use the previously defined bounding box to create the overpass query.
 
@@ -117,8 +118,6 @@ schools <- bb %>%
   opq() %>%
   add_osm_feature(key = "amenity", value = "school") %>%
   osmdata_sf()
-
-
 ```
 
 ## Understanding the osmdata object
@@ -163,11 +162,10 @@ You will have to plug in the values from the table into the new format for `coor
 
 `xlim = c(xmin, xmax), ylim = c(ymin, ymax)`
 ```{r}
-
 ggplot() +
   geom_sf(data = schools$osm_polygons) +
-  geom_sf_text(data = schools$osm_polygons, aes(label = name), size = 2, hjust = 0) +
-  coord_sf(xlim = c(-156.69726, -155.97909), ylim = c(20.57443, 21.03156), expand = FALSE)
+  geom_sf_text(data = schools$osm_polygons, aes(label = name), size = 2, hjust = 0) + #Used int_name because it doesnt register japanese characters and gives blank boxes
+  coord_sf(xlim = c(144.61, 145.1), ylim = c(13.3, 13.7), expand = FALSE)
 ```
 The `osmdata` package can also be used to download other spatial features such as streets and coastlines, and overlay them on top of each other using `ggplot2` to create a map with more context. For this we create multiple queries for each feature like the code chunk below.
 
@@ -175,25 +173,23 @@ After reading through the whole tutorial, come back and do:
 
 **Challenge 4: Run the code below to update with your target area bounding box.** 
 ```{r}
-
-# retrieving data of streets on Maui
+#Retrieving data of streets in Guam
 streets <- bb %>%
   opq() %>%
   add_osm_feature("highway", c("motorway", "primary", "secondary", "tertiary")) %>%
   osmdata_sf()
 
-# retrieving data of small streets on Maui
+#Retrieving data of small streets in Guam
 small_streets <- bb %>%
   opq() %>%
   add_osm_feature(key = "highway", value = c("residential", "living_street", "unclassified", "service", "footway")) %>%
   osmdata_sf()
 
-# retrieving data of coastline on Maui
+#Retrieving data of coastline in Guam
 coastline <- bb %>%
   opq() %>%
   add_osm_feature(key = "natural", value = "coastline") %>%
   osmdata_sf()
-
 ```
 
 Then we use the `ggplot2` package to visualize each of these features along with the hospitals on Maui. Note how we have used different colors, line sizes (thicknesses) and opacities (opaque is the opposite of transparent) to differentiate among the features.
@@ -205,15 +201,19 @@ After reading through the whole tutorial, come back and do:
 ```{r}
 # visualising all retrieved features over each other to form a map of Maui
 ggplot() +
-  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#ffbe7f", size = .4, alpha = .8) +
-  geom_sf(data = small_streets$osm_lines, inherit.aes = FALSE, color = "#a6a6a6", size = .2, alpha = .8) +
-  geom_sf(data = coastline$osm_lines, inherit.aes = FALSE, color = "black", size = .8, alpha = .5) +
-  geom_sf(data = schools$osm_polygons, inherit.aes = FALSE, colour = "red", fill = "red", alpha = .5, size = 1) +
-  coord_sf(xlim = c(-156.69726, -155.97909), ylim = c(20.57443, 21.03156), expand = TRUE) +
-  geom_sf_text(data = schools$osm_polygons, aes(label = name), size = 2, hjust = 0) +
+  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#ffbe7f",size =.4,alpha =.8) +
+  geom_sf(data = small_streets$osm_lines, inherit.aes = FALSE, color = "#a6a6a6",size =.2,alpha =.8) +
+  geom_sf(data = coastline$osm_lines, inherit.aes = FALSE, color = "black", size =.8, alpha = 0.5) +
+  geom_sf(data = schools$osm_polygons, inherit.aes = FALSE, colour = "red", fill = "red", alpha = 0.5, size = 1) +
+  coord_sf(xlim = c(144.61, 145.05), ylim = c(13.2, 13.7), expand = FALSE) +
+  geom_sf_text(data = schools$osm_polygons, aes(label = name), 
+               size = 2, 
+               hjust = 0, 
+               nudge_y = 0.01,  # Adjust vertical position to avoid overlap
+               check_overlap = TRUE) +  # Prevent overlap of labels
   theme_bw() +
   labs(
-    title = "Schools on Maui",
+    title = "Schools in Guahan",
     x = "Longitude",
     y = "Latitude"
   )
