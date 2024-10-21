@@ -128,6 +128,7 @@ Packages required for this tutorial:
 Refer back to the [Welcome to R](https://nsf-all-spice-alliance.github.io/SDG-Analytics-in-R/rmarkdowns/intro_to_R.html) tutorial if you need a reminder on how to do this.  
 
 ```{r}
+install.packages(c("tidyverse", "sf", "rnaturalearth", "rnaturalearthdata", "rnaturalearthhires"))
 library(tidyverse)
 library(sf)
 library(rnaturalearth)
@@ -176,7 +177,7 @@ Now let's add a title and subtitle to our map.
 ```{r}
 ggplot(data = world) +
     geom_sf() +
-    ggtitle("Countries of the World", subtitle = "Created by Catherine Brockway")
+    ggtitle("Countries of the World", subtitle = "Created by Kyle-Jacob La'akea Gamiao")
 
 ```
 
@@ -195,9 +196,15 @@ The code chunk below will create a new dataframe called `world_without_antarctic
 **Challenge 2: Instead of removing antarctica, remove Australia from the map**. Remember to change the name of the dataframe to something like `world_without_Australia`. 
 
 Nothing against Australia! We're just learning how to navigate dataframes and make choices about our maps.
+
 ```{r}
-world_without_antarctica <- world %>% 
+world_without_antarctica <- world %>%
   filter(iso_a3 != "ATA")
+```
+
+```{r}
+world_without_Australia <- world %>% 
+  filter(iso_a3 != "AUS")
 ```
 
 Then we create a new use of the `ggplot()` function that specifies our new dataframe without Antarctica. Notice this code is slightly different in terms of where the `data = world_without_antarctica` part shows up. This is one of many examples where there are multiple ways of doing the same thing in R. It's a matter of style, and you will develop your own preferred style as you learn more.
@@ -226,7 +233,7 @@ The colors we are using here are what are known as "hex colors", because they ar
 ```{r}
 ggplot() + 
   geom_sf(data = world_without_antarctica, 
-          fill = "#669438", color = "#32481B", size = 0.25) +
+          fill = "#002147", color = "#CC6600", size = 0.25) +
   ggtitle("Countries of the World", subtitle = "without Antarctica")
 ```
 
@@ -234,7 +241,7 @@ Now let's work on an important aspect of cartographic design: decluttering our m
 ```{r}
 ggplot() + 
   geom_sf(data = world_without_antarctica, 
-          fill = "#669438", color = "#32481B", size = 0.25) +
+          fill = "#002147", color = "#CC6600", size = 0.25) +
   ggtitle("Countries of the World", subtitle = "without Antarctica")+
   theme_void()
 ```
@@ -253,7 +260,7 @@ ggplot() +
   geom_sf(data = world_without_antarctica, 
           aes(fill = as.factor(mapcolor7)),
           color = "#401D16", size = 0.25) +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "BuPu") +
   guides(fill = "none") +
   theme_void()
 ```
@@ -292,8 +299,8 @@ The Orthographic Azimuthal projection is a good option if you want to choose the
 ```{r}
 ggplot(data = world) +
   geom_sf(fill = "#669438", color = "#32481B", size = 0.25) +
-    coord_sf(crs = "+proj=ortho +lat_0=33 +lon_0=-101 ") +
-  ggtitle("Lubbock, TX as the Center of the World", subtitle = "Orthographic Azimuthal")+
+    coord_sf(crs = "+proj=ortho +lat_0=21.3193 +lon_0=157.8484 ") +
+  ggtitle("Punchbowl O'ahu as the Center of the World", subtitle = "Orthographic Azimuthal")+
   theme_void()
 
 ```

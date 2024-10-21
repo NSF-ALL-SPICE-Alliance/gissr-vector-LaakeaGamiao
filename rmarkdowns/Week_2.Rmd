@@ -52,6 +52,12 @@ Packages required for this tutorial:
 You should have all these packages installed from last week, so you just need to load them for this session by running the code chunk below.  
 
 ```{r}
+install.packages("devtools")
+library(devtools)
+devtools::install_github("ropensci/rnaturalearthhires")
+```
+
+```{r}
 library(tidyverse)
 library(sf)
 library(rnaturalearth)
@@ -77,12 +83,11 @@ We can create a "bounding box" for our existing `world` dataset that will "zoom 
 **Challenge 1: Create a bounding box for your region**. This should be the region around the your target area. 
 
 ```{r}
-ggplot(data = world) +
-    geom_sf() +
-    coord_sf(xlim = c(-130, -110), ylim = c(40, 50), expand = FALSE) +
-    ggtitle("Pacific Northwest of the United States")+
-    theme_void()
-
+ggplot() +
+    geom_sf(data = world) +
+    coord_sf(xlim = c(135, 141), ylim = c(34.5, 37.5), expand = FALSE) +
+  ggtitle("Central Japan") +
+  theme_void()
 ```
 
 This gives us a very simple map which doesn't provide much information. We will need to add more data layers to make the map more meaningful.
@@ -92,8 +97,9 @@ Let's create a layer that includes state/province level data.
 **Challenge 2: Create a new layer with state/province data for your the country of your final project area**. 
 
 ```{r}
-states <- (ne_states(country = "United States of America"))
+states <- (ne_states(country = "Japan"))
 ```
+
 
 Now we can add this layer to our existing map with a second `geom_sf`. 
 
@@ -103,10 +109,9 @@ Now we can add this layer to our existing map with a second `geom_sf`.
 ggplot() +
     geom_sf(data = world) +
     geom_sf(data = states) +
-    coord_sf(xlim = c(-130, -110), ylim = c(40, 50), expand = FALSE) +
-    ggtitle("Pacific Northwest of the United States")+
-    theme_void()
-
+    coord_sf(xlim = c(135, 141), ylim = c(34.5, 37.5), expand = FALSE) +
+  ggtitle("Central Japan") +
+  theme_void()
 ```
 
 To see what other cultural/political features are available, use the function `df_layers_cultural`. 
@@ -161,15 +166,13 @@ Now let's add the lakes and rivers to our map.
 **Challenge 4: Update the `coord_sf` with your bounding box and your `ggtitle` with your own title.** The `states` layer should also now be updated with your new `states` dataframe you created in Challenge 2. 
 
 ```{r}
-ggplot() +
-    geom_sf(data = world) +
+ggplot() +  #Got rid of world shapefile because it made a weird double line
     geom_sf(data = states) +
     geom_sf(data = lakes50) +
     geom_sf(data = rivers50) +
-    coord_sf(xlim = c(-130, -110), ylim = c(40, 50), expand = FALSE) +
-    ggtitle("Pacific Northwest Region of the United States")+
+    coord_sf(xlim = c(135, 141), ylim = c(34.5, 37.5), expand = FALSE) +
+    ggtitle("Central Japan") +
     theme_void()
-
 ```
 
 Now let's choose colors for all of our layers, and add some labels from the `states` layer with a `geom_text` layer. 
@@ -178,13 +181,12 @@ Now let's choose colors for all of our layers, and add some labels from the `sta
 
 ```{r}
 ggplot() +
-    geom_sf(data = world, fill = "lightgray") +
     geom_sf(data = states, fill = "antiquewhite1", size = 0.25) +
-    geom_sf(data = lakes50, fill = "darkblue", color = "black") +
+    geom_sf(data = lakes50, fill = "blue", color = "black") +
     geom_sf(data = rivers50, color = "lightblue", size = 0.15) +
     geom_sf_text(data = states, aes(label = name), size = 5, fontface = "bold", nudge_y = states$nudge_y) +
-    coord_sf(xlim = c(-130, -110), ylim = c(40, 50), expand = FALSE) +
-    ggtitle("Pacific Northwest Region of the United States")+
+    coord_sf(xlim = c(135, 141), ylim = c(34.5, 37.5), expand = FALSE) +
+    ggtitle("Central Japan") +
     theme_void()
 
 ```
@@ -194,8 +196,8 @@ For our final addition, let's highlight the specific area we will be focusing on
 **Challenge 6: Update the name of the state/province that you are focused on for your project.** Remember to change the name of the data object (to the left of the `<-`) to your target area. 
 
 ```{r}
-washington <- states %>%
-  filter(name == "Washington")
+tokyo <- states %>%
+  filter(name == "Tokyo")
 ```
 
 Now let's add that as a layer (the last `geom_sf` in our code) on our map, use the same fill color as the other states, and color the border red. We want this layer to be on top of the other layers on our map, so it should come after (below) the other `geom_sf` lines of our code. The order of our layers is very important!
@@ -204,16 +206,14 @@ Now let's add that as a layer (the last `geom_sf` in our code) on our map, use t
 
 ```{r}
 ggplot() +
-    geom_sf(data = world, fill = "lightgray") +
     geom_sf(data = states, fill = "antiquewhite1", size = 0.25) +
     geom_sf(data = lakes50, fill = "darkblue", color = "black") +
     geom_sf(data = rivers50, color = "lightblue", size = 0.15) +
-    geom_sf(data = washington, fill = "antiquewhite2", color = "red")+
-    geom_text(data = states, aes(x = longitude, y = latitude, label = name), size = 5, fontface = "bold", nudge_y = states$nudge_y) +
-    coord_sf(xlim = c(-130, -110), ylim = c(40, 50), expand = FALSE) +
-    ggtitle("Washington State", subtitle = "in the Pacific Northwest Region of the United States")+
+    geom_sf(data = tokyo, fill = "antiquewhite2", color = "red")+
+    geom_text(data = states, aes(x = longitude, y = latitude, label = name), size = 3, fontface = "bold", nudge_y = states$nudge_y) +
+    coord_sf(xlim = c(135, 141), ylim = c(34.5, 37.5), expand = FALSE) +
+    ggtitle("Tokyo", subtitle = "in the Central Region of Japan") +
     theme_void()
-
 ```
 
 # Final Challenge Preparation
